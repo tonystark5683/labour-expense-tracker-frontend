@@ -175,6 +175,7 @@ export const styles = StyleSheet.create({
     color: COLORS.textLight,
   },
   transactionRight: {
+    paddingRight: 10,
     alignItems: "flex-end",
   },
   transactionAmount: {

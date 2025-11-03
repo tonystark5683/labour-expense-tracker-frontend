@@ -15,7 +15,7 @@ export default function Page() {
   const router = useRouter();
   const [refreshing, setRefreshing] = useState(false);
 
-  const { laborers, isLoading, loadData } = useLaborers(user.id);
+  const { laborers, isLoading, loadData, deleteLaborer } = useLaborers(user.id);
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -73,7 +73,22 @@ export default function Page() {
         style={styles.transactionsList}
         contentContainerStyle={styles.transactionsListContent}
         data={laborers}
-        renderItem={({ item }) => <LaborerItem item={item} onPress={handleLaborerPress} />}
+        renderItem={({ item }) => (
+          <LaborerItem 
+            item={item} 
+            onPress={handleLaborerPress}
+            onDelete={async (id, confirmationName) => {
+              try {
+                const success = await deleteLaborer(id, confirmationName);
+                if (success) {
+                  loadData();
+                }
+              } catch (error) {
+                console.error("Error deleting laborer:", error);
+              }
+            }}
+          />
+        )}
         ListEmptyComponent={<NoLaborersFound />}
         showsVerticalScrollIndicator={false}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}

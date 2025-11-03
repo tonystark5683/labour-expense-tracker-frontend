@@ -26,6 +26,7 @@ export default function LaborerDetails() {
   const [selectedCategory, setSelectedCategory] = useState("");
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
+  const [deletingTransaction, setDeletingTransaction] = useState(false);
 
   const loadData = useCallback(async () => {
     try {
@@ -238,9 +239,60 @@ export default function LaborerDetails() {
                 <Text style={styles.transactionCategory}>{transaction.category}</Text>
                 <Text style={styles.transactionDate}>{formatDate(transaction.created_at)}</Text>
               </View>
-              <Text style={styles.transactionAmount}>
-                -₹{Math.abs(transaction.amount)}
-              </Text>
+              <View style={styles.transactionRight}>
+                <Text style={styles.transactionAmount}>
+                  -₹{Math.abs(transaction.amount)}
+                </Text>
+                <TouchableOpacity
+                  onPress={() => {
+                    Alert.alert(
+                      "Delete Transaction",
+                      "To confirm deletion, please enter the transaction title:",
+                      [
+                        { text: "Cancel", style: "cancel" },
+                        {
+                          text: "Delete",
+                          style: "destructive",
+                          onPress: async (confirmationTitle) => {
+                            if (!confirmationTitle) {
+                              Alert.alert("Error", "Please enter the transaction title");
+                              return;
+                            }
+                            try {
+                              const response = await fetch(`${API_URL}/transactions/${transaction._id}`, {
+                                method: "DELETE",
+                                headers: {
+                                  "Content-Type": "application/json",
+                                },
+                                body: JSON.stringify({ confirmationTitle }),
+                              });
+                              
+                              if (!response.ok) {
+                                const errorData = await response.json();
+                                throw new Error(errorData.message);
+                              }
+                              
+                              await loadData();
+                              Alert.alert("Success", "Transaction deleted successfully");
+                            } catch (error) {
+                              Alert.alert("Error", error.message);
+                            }
+                          },
+                        },
+                      ],
+                      {
+                        input: {
+                          placeholder: "Enter transaction title",
+                          onChange: (text) => text,
+                        },
+                      }
+                    );
+                  }}
+                  style={styles.deleteButton}
+                >
+                  <Ionicons name="trash-outline" size={20} color={COLORS.expense} />
+                </TouchableOpacity>
+              </View>
             </View>
           ))}
           {data?.transactions.length === 0 && (

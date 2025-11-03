@@ -62,5 +62,30 @@ export const useLaborers = (userId) => {
     }
   };
 
-  return { laborers, isLoading, loadData, createLaborer };
+  const deleteLaborer = async (id, confirmationName) => {
+    try {
+      const response = await fetch(`${API_URL}/laborers/${id}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ confirmationName }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to delete laborer");
+      }
+
+      await loadData();
+      Alert.alert("Success", "Laborer and associated transactions deleted successfully");
+      return true;
+    } catch (error) {
+      console.error("Error deleting laborer:", error);
+      Alert.alert("Error", error.message);
+      return false;
+    }
+  };
+
+  return { laborers, isLoading, loadData, createLaborer, deleteLaborer };
 };

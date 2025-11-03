@@ -51,17 +51,29 @@ export const useTransactions = (userId) => {
     }
   }, [fetchTransactions, fetchSummary, userId]);
 
-  const deleteTransaction = async (id) => {
+  const deleteTransaction = async (id, confirmationTitle) => {
     try {
-      const response = await fetch(`${API_URL}/transactions/${id}`, { method: "DELETE" });
-      if (!response.ok) throw new Error("Failed to delete transaction");
+      const response = await fetch(`${API_URL}/transactions/${id}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ confirmationTitle }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to delete transaction");
+      }
 
       // Refresh data after deletion
       loadData();
       Alert.alert("Success", "Transaction deleted successfully");
+      return true;
     } catch (error) {
       console.error("Error deleting transaction:", error);
       Alert.alert("Error", error.message);
+      return false;
     }
   };
 
