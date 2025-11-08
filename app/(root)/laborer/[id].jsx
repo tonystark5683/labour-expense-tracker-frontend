@@ -3,18 +3,23 @@ import { useRouter, useLocalSearchParams } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { styles } from "../../../assets/styles/create.styles";
+import { tabStyles } from "../../../assets/styles/tabs.styles";
 import { COLORS } from "../../../constants/colors";
 import { API_URL } from "../../../constants/api";
 import { formatDate } from "../../../lib/utils";
+import DashboardTab from "../../../components/DashboardTab";
 
 const CATEGORIES = [
   { id: "wages", name: "Wages", icon: "cash" },
   { id: "groceries", name: "Groceries", icon: "cart" },
   { id: "advance", name: "Cash", icon: "wallet" },
   { id: "medical", name: "Medical", icon: "medical" },
-  // { id: "tools", name: "Tools & Equipment", icon: "construct" },
-  // { id: "transport", name: "Transport", icon: "bus" },
   { id: "other", name: "Other", icon: "ellipsis-horizontal" }
+];
+
+const TABS = [
+  { id: 'transactions', name: 'Transactions', icon: 'list' },
+  { id: 'dashboard', name: 'Dashboard', icon: 'stats-chart' }
 ];
 
 export default function LaborerDetails() {
@@ -26,7 +31,7 @@ export default function LaborerDetails() {
   const [selectedCategory, setSelectedCategory] = useState("");
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
-  const [deletingTransaction, setDeletingTransaction] = useState(false);
+  const [activeTab, setActiveTab] = useState('transactions');
 
   const loadData = useCallback(async () => {
     try {
@@ -87,6 +92,144 @@ export default function LaborerDetails() {
     }
   };
 
+  const renderTransactionsTab = () => (
+    <ScrollView
+      style={styles.container}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
+    >
+      {/* ADD NEW TRANSACTION */}
+      <View style={styles.card}>
+        <Text style={styles.cardTitle}>Add New Transaction</Text>
+        
+        <View style={styles.inputContainer}>
+          <Ionicons
+            name="create-outline"
+            size={22}
+            color={COLORS.textLight}
+            style={styles.inputIcon}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Description"
+            placeholderTextColor={COLORS.textLight}
+            value={description}
+            onChangeText={setDescription}
+          />
+        </View>
+
+        <View style={styles.inputContainer}>
+          <Ionicons
+            name="cash-outline"
+            size={22}
+            color={COLORS.textLight}
+            style={styles.inputIcon}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Amount (₹)"
+            placeholderTextColor={COLORS.textLight}
+            value={amount}
+            onChangeText={setAmount}
+            keyboardType="numeric"
+          />
+        </View>
+
+        <Text style={styles.sectionTitle}>Category</Text>
+        <View style={styles.categoryGrid}>
+          {CATEGORIES.map((category) => (
+            <TouchableOpacity
+              key={category.id}
+              style={[
+                styles.categoryButton,
+                selectedCategory === category.name && styles.categoryButtonActive,
+              ]}
+              onPress={() => setSelectedCategory(category.name)}
+            >
+              <Ionicons
+                name={category.icon}
+                size={20}
+                color={selectedCategory === category.name ? COLORS.white : COLORS.text}
+                style={styles.categoryIcon}
+              />
+              <Text
+                style={[
+                  styles.categoryButtonText,
+                  selectedCategory === category.name && styles.categoryButtonTextActive,
+                ]}
+              >
+                {category.name}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+
+        <TouchableOpacity style={styles.addButton} onPress={addTransaction}>
+          <Ionicons name="add-circle" size={20} color={COLORS.white} />
+          <Text style={styles.addButtonText}>Add Transaction</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* TRANSACTIONS LIST */}
+      <View style={styles.card}>
+        <Text style={styles.cardTitle}>Recent Transactions</Text>
+        {data?.transactions.map((transaction) => (
+          <View key={transaction._id} style={styles.transactionItem}>
+            <View style={styles.transactionLeft}>
+              <Text style={styles.transactionTitle}>{transaction.title}</Text>
+              <Text style={styles.transactionCategory}>{transaction.category}</Text>
+              <Text style={styles.transactionDate}>{formatDate(transaction.created_at)}</Text>
+            </View>
+            <View style={styles.transactionRight}>
+              <Text style={styles.transactionAmount}>
+                -₹{Math.abs(transaction.amount)}
+              </Text>
+              <TouchableOpacity
+                onPress={() => {
+                  Alert.alert(
+                    "Delete Transaction",
+                    "Are you sure you want to delete this transaction?",
+                    [
+                      { text: "Cancel", style: "cancel" },
+                      {
+                        text: "Delete",
+                        style: "destructive",
+                        onPress: async () => {
+                          try {
+                            const response = await fetch(`${API_URL}/transactions/${transaction._id}`, {
+                              method: "DELETE",
+                            });
+                            
+                            if (!response.ok) {
+                              const errorData = await response.json();
+                              throw new Error(errorData.message);
+                            }
+                            
+                            await loadData();
+                            Alert.alert("Success", "Transaction deleted successfully");
+                          } catch (error) {
+                            Alert.alert("Error", error.message);
+                          }
+                        },
+                      },
+                    ]
+                  );
+                }}
+                style={styles.deleteButton}
+              >
+                <Ionicons name="trash-outline" size={20} color={COLORS.expense} />
+              </TouchableOpacity>
+            </View>
+          </View>
+        ))}
+        {data?.transactions.length === 0 && (
+          <Text style={styles.noTransactions}>No transactions yet</Text>
+        )}
+      </View>
+    </ScrollView>
+  );
+
   if (isLoading) {
     return (
       <View style={styles.loadingContainer}>
@@ -96,22 +239,16 @@ export default function LaborerDetails() {
   }
 
   return (
-    <View style={styles.container}>
-      {/* HEADER */}
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-          <Ionicons name="arrow-back" size={24} color={COLORS.text} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>{data?.laborer.name}</Text>
-        <View style={{ width: 40 }} />
-      </View>
+      <View style={[styles.container, { flex: 1 }]}>
+        {/* HEADER */}
+        <View style={styles.header}>
+          <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+            <Ionicons name="arrow-back" size={24} color={COLORS.text} />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>{data?.laborer.name}</Text>
+          <View style={{ width: 40 }} />
+        </View>
 
-      <ScrollView
-        style={styles.container}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
-      >
         {/* LABORER INFO CARD */}
         <View style={styles.card}>
           <View style={styles.infoRow}>
@@ -121,169 +258,53 @@ export default function LaborerDetails() {
             </View>
             <View style={styles.infoItem}>
               {data?.laborer.phone && (
-              <View style={styles.infoRow}>
-                <View style={styles.infoItem}>
-                  <Text style={styles.infoLabel}>Phone</Text>
-                  <Text style={styles.infoValue}>{data.laborer.phone}</Text>
+                <View style={styles.infoRow}>
+                  <View style={styles.infoItem}>
+                    <Text style={styles.infoLabel}>Phone</Text>
+                    <Text style={styles.infoValue}>{data.laborer.phone}</Text>
+                  </View>
                 </View>
-              </View>
-          )}
+              )}
             </View>
           </View>
         </View>
 
-        {/* SUMMARY CARD */}
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Summary</Text>
-          <View style={styles.summaryGrid}>
-            <View style={styles.summaryItem}>
-              <Text style={styles.summaryLabel}>Total</Text>
-              <Text style={styles.summaryValue}>₹{Math.abs(data?.summary.total || 0)}</Text>
-            </View>
-            <View style={styles.summaryItem}>
-              <Text style={styles.summaryLabel}>Wages</Text>
-              <Text style={styles.summaryValue}>₹{Math.abs(data?.summary.wages_total || 0)}</Text>
-            </View>
-            <View style={styles.summaryItem}>
-              <Text style={styles.summaryLabel}>Groceries</Text>
-              <Text style={styles.summaryValue}>₹{Math.abs(data?.summary.groceries_total || 0)}</Text>
-            </View>
-            <View style={styles.summaryItem}>
-              <Text style={styles.summaryLabel}>Cash</Text>
-              <Text style={styles.summaryValue}>₹{Math.abs(data?.summary.advance_total || 0)}</Text>
-            </View>
-          </View>
-        </View>
-
-        {/* ADD NEW TRANSACTION */}
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Add New Transaction</Text>
-          
-          <View style={styles.inputContainer}>
-            <Ionicons
-              name="create-outline"
-              size={22}
-              color={COLORS.textLight}
-              style={styles.inputIcon}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Description"
-              placeholderTextColor={COLORS.textLight}
-              value={description}
-              onChangeText={setDescription}
-            />
-          </View>
-
-          <View style={styles.inputContainer}>
-            <Ionicons
-              name="cash-outline"
-              size={22}
-              color={COLORS.textLight}
-              style={styles.inputIcon}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Amount (₹)"
-              placeholderTextColor={COLORS.textLight}
-              value={amount}
-              onChangeText={setAmount}
-              keyboardType="numeric"
-            />
-          </View>
-
-          <Text style={styles.sectionTitle}>Category</Text>
-          <View style={styles.categoryGrid}>
-            {CATEGORIES.map((category) => (
-              <TouchableOpacity
-                key={category.id}
+        {/* TABS */}
+        <View style={tabStyles.tabContainer}>
+          {TABS.map(tab => (
+            <TouchableOpacity
+              key={tab.id}
+              style={[
+                tabStyles.tab,
+                activeTab === tab.id && tabStyles.activeTab
+              ]}
+              onPress={() => setActiveTab(tab.id)}
+            >
+              <Ionicons
+                name={tab.icon}
+                size={20}
+                color={activeTab === tab.id ? COLORS.primary : COLORS.textLight}
+              />
+              <Text
                 style={[
-                  styles.categoryButton,
-                  selectedCategory === category.name && styles.categoryButtonActive,
+                  tabStyles.tabText,
+                  activeTab === tab.id && tabStyles.activeTabText
                 ]}
-                onPress={() => setSelectedCategory(category.name)}
               >
-                <Ionicons
-                  name={category.icon}
-                  size={20}
-                  color={selectedCategory === category.name ? COLORS.white : COLORS.text}
-                  style={styles.categoryIcon}
-                />
-                <Text
-                  style={[
-                    styles.categoryButtonText,
-                    selectedCategory === category.name && styles.categoryButtonTextActive,
-                  ]}
-                >
-                  {category.name}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-
-          <TouchableOpacity style={styles.addButton} onPress={addTransaction}>
-            <Ionicons name="add-circle" size={20} color={COLORS.white} />
-            <Text style={styles.addButtonText}>Add Transaction</Text>
-          </TouchableOpacity>
+                {tab.name}
+              </Text>
+            </TouchableOpacity>
+          ))}
         </View>
 
-        {/* TRANSACTIONS LIST */}
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Recent Transactions</Text>
-          {data?.transactions.map((transaction) => (
-            <View key={transaction._id} style={styles.transactionItem}>
-              <View style={styles.transactionLeft}>
-                <Text style={styles.transactionTitle}>{transaction.title}</Text>
-                <Text style={styles.transactionCategory}>{transaction.category}</Text>
-                <Text style={styles.transactionDate}>{formatDate(transaction.created_at)}</Text>
-              </View>
-              <View style={styles.transactionRight}>
-                <Text style={styles.transactionAmount}>
-                  -₹{Math.abs(transaction.amount)}
-                </Text>
-                <TouchableOpacity
-                  onPress={() => {
-                    Alert.alert(
-                      "Delete Transaction",
-                      "Are you sure you want to delete this transaction?",
-                      [
-                        { text: "Cancel", style: "cancel" },
-                        {
-                          text: "Delete",
-                          style: "destructive",
-                          onPress: async () => {
-                            try {
-                              const response = await fetch(`${API_URL}/transactions/${transaction._id}`, {
-                                method: "DELETE",
-                              });
-                              
-                              if (!response.ok) {
-                                const errorData = await response.json();
-                                throw new Error(errorData.message);
-                              }
-                              
-                              await loadData();
-                              Alert.alert("Success", "Transaction deleted successfully");
-                            } catch (error) {
-                              Alert.alert("Error", error.message);
-                            }
-                          },
-                        },
-                      ]
-                    );
-                  }}
-                  style={styles.deleteButton}
-                >
-                  <Ionicons name="trash-outline" size={20} color={COLORS.expense} />
-                </TouchableOpacity>
-              </View>
-            </View>
-          ))}
-          {data?.transactions.length === 0 && (
-            <Text style={styles.noTransactions}>No transactions yet</Text>
+        {/* TAB CONTENT */}
+        <View style={{ flex: 1 }}>
+          {activeTab === 'transactions' ? (
+            renderTransactionsTab()
+          ) : (
+            <DashboardTab transactions={data?.transactions || []} />
           )}
         </View>
-      </ScrollView>
-    </View>
+      </View>
   );
 }

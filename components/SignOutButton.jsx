@@ -18,7 +18,7 @@ export const SignOutButton = () => {
 
   return (
     <TouchableOpacity style={styles.logoutButton} onPress={handleSignOut}>
-      <Ionicons name="log-out-outline" size={22} color={COLORS.text} />
+      <Ionicons name="log-out-outline" size={17} color={COLORS.text} />
     </TouchableOpacity>
   );
 };

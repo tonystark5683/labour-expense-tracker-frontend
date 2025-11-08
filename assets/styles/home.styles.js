@@ -32,13 +32,13 @@ export const styles = StyleSheet.create({
     flex: 1,
   },
   welcomeText: {
-    fontSize: 14,
+    fontSize: 12,
     color: COLORS.textLight,
     marginBottom: 2,
   },
   usernameText: {
-    fontSize: 16,
-    fontWeight: "600",
+    fontSize: 15,
+    fontWeight: "500",
     color: COLORS.text,
   },
   headerRight: {
@@ -259,7 +259,7 @@ export const styles = StyleSheet.create({
   },
   transactionsList: {
     flex: 1,
-    marginHorizontal: 20,
+    marginHorizontal: 10,
   },
   transactionsListContent: {
     paddingBottom: 20,

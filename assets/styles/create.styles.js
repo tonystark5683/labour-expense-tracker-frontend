@@ -7,7 +7,7 @@ export const styles = StyleSheet.create({
   infoRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginBottom: 15,
+    marginBottom: 5,
   },
   infoItem: {
     flex: 1,
