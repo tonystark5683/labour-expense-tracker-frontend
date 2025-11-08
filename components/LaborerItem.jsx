@@ -121,7 +121,7 @@ export const LaborerItem = ({ item, onPress, onDelete }) => {
             </View>
             <View style={styles.transactionRight}>
               <Text style={styles.transactionDate}>{item.phone || 'No phone'}</Text>
-              <Text style={styles.transactionDate}>Since {formatDate(item.joining_date)}</Text>
+              <Text style={styles.transactionDate}>Since {formatDate(item.joining_date).split(',')[0]}</Text>
             </View>
           </TouchableOpacity>
           <TouchableOpacity style={styles.deleteButton} onPress={() => setIsDialogVisible(true)}>

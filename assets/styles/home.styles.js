@@ -184,8 +184,10 @@ export const styles = StyleSheet.create({
     marginBottom: 4,
   },
   transactionDate: {
-    fontSize: 12,
+    fontSize: 11,
     color: COLORS.textLight,
+    textAlign: "right",
+    marginTop: 2,
   },
   deleteButton: {
     padding: 15,
