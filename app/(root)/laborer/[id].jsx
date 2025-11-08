@@ -10,10 +10,10 @@ import { formatDate } from "../../../lib/utils";
 const CATEGORIES = [
   { id: "wages", name: "Wages", icon: "cash" },
   { id: "groceries", name: "Groceries", icon: "cart" },
-  { id: "advance", name: "Advance", icon: "wallet" },
+  { id: "advance", name: "Cash", icon: "wallet" },
   { id: "medical", name: "Medical", icon: "medical" },
-  { id: "tools", name: "Tools & Equipment", icon: "construct" },
-  { id: "transport", name: "Transport", icon: "bus" },
+  // { id: "tools", name: "Tools & Equipment", icon: "construct" },
+  // { id: "transport", name: "Transport", icon: "bus" },
   { id: "other", name: "Other", icon: "ellipsis-horizontal" }
 ];
 
@@ -116,22 +116,20 @@ export default function LaborerDetails() {
         <View style={styles.card}>
           <View style={styles.infoRow}>
             <View style={styles.infoItem}>
-              <Text style={styles.infoLabel}>Daily Wage</Text>
-              <Text style={styles.infoValue}>₹{data?.laborer.daily_wage}</Text>
-            </View>
-            <View style={styles.infoItem}>
               <Text style={styles.infoLabel}>Since</Text>
               <Text style={styles.infoValue}>{formatDate(data?.laborer.joining_date)}</Text>
             </View>
-          </View>
-          {data?.laborer.phone && (
-            <View style={styles.infoRow}>
-              <View style={styles.infoItem}>
-                <Text style={styles.infoLabel}>Phone</Text>
-                <Text style={styles.infoValue}>{data.laborer.phone}</Text>
+            <View style={styles.infoItem}>
+              {data?.laborer.phone && (
+              <View style={styles.infoRow}>
+                <View style={styles.infoItem}>
+                  <Text style={styles.infoLabel}>Phone</Text>
+                  <Text style={styles.infoValue}>{data.laborer.phone}</Text>
+                </View>
               </View>
-            </View>
           )}
+            </View>
+          </View>
         </View>
 
         {/* SUMMARY CARD */}
@@ -151,7 +149,7 @@ export default function LaborerDetails() {
               <Text style={styles.summaryValue}>₹{Math.abs(data?.summary.groceries_total || 0)}</Text>
             </View>
             <View style={styles.summaryItem}>
-              <Text style={styles.summaryLabel}>Advance</Text>
+              <Text style={styles.summaryLabel}>Cash</Text>
               <Text style={styles.summaryValue}>₹{Math.abs(data?.summary.advance_total || 0)}</Text>
             </View>
           </View>

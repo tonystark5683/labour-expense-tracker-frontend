@@ -96,8 +96,8 @@ const CATEGORY_ICONS = {
   "Groceries": "cart",
   "Advance": "wallet",
   "Medical": "medical",
-  "Tools & Equipment": "construct",
-  "Transport": "bus",
+  // "Tools & Equipment": "construct",
+  // "Transport": "bus",
   "Other": "ellipsis-horizontal",
 };
 
