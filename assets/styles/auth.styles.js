@@ -6,19 +6,24 @@ export const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.background,
-    padding: 20,
+    padding: 25,
     justifyContent: "center",
   },
   illustration: {
-    height: 310,
+    height: 510,
     width: 300,
-    resizeMode: "contain",
+    marginLeft: "auto",
+    marginRight: "auto",
+    marginBottom: -80, // Reduce space between image and text
+    justifyContent: "center",
+    resizeMode: "cover",
   },
   title: {
     fontSize: 32,
     fontWeight: "bold",
-    color: COLORS.text,
-    marginVertical: 15,
+    color: COLORS.primary,
+    textShadowRadius: 2,
+    marginVertical: 8,
     textAlign: "center",
   },
   input: {

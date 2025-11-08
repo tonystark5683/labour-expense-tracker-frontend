@@ -82,7 +82,7 @@ export const styles = StyleSheet.create({
   balanceCard: {
     backgroundColor: COLORS.card,
     borderRadius: 20,
-    padding: 20,
+    padding: 0,
     marginBottom: 20,
     shadowColor: COLORS.shadow,
     shadowOffset: {

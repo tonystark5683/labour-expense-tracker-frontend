@@ -14,21 +14,16 @@ const CreateScreen = () => {
 
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
-  const [dailyWage, setDailyWage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const handleCreate = async () => {
     if (!name.trim()) return Alert.alert("Error", "Please enter laborer's name");
-    if (!dailyWage || isNaN(parseFloat(dailyWage)) || parseFloat(dailyWage) <= 0) {
-      return Alert.alert("Error", "Please enter a valid daily wage");
-    }
 
     setIsLoading(true);
     try {
       const success = await createLaborer({
         name: name.trim(),
-        phone: phone.trim(),
-        daily_wage: parseFloat(dailyWage)
+        phone: phone.trim()
       });
 
       if (success) {
@@ -90,24 +85,6 @@ const CreateScreen = () => {
             value={phone}
             onChangeText={setPhone}
             keyboardType="phone-pad"
-          />
-        </View>
-
-        {/* Daily Wage Input */}
-        <View style={styles.inputContainer}>
-          <Ionicons
-            name="cash-outline"
-            size={22}
-            color={COLORS.textLight}
-            style={styles.inputIcon}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Daily Wage (₹)"
-            placeholderTextColor={COLORS.textLight}
-            value={dailyWage}
-            onChangeText={setDailyWage}
-            keyboardType="numeric"
           />
         </View>
       </View>

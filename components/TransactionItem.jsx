@@ -8,17 +8,17 @@ import Modal from 'react-native-modal';
 
 const enhance = StyleSheet.create({
   card: {
-    backgroundColor: 'white',
+    backgroundColor: COLORS.card,
     borderRadius: 12,
     marginHorizontal: 16,
     marginVertical: 8,
     padding: 16,
-    shadowColor: "#000",
+    shadowColor: COLORS.shadow,
     shadowOffset: {
       width: 0,
       height: 2,
     },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.2,
     shadowRadius: 3.84,
     elevation: 5,
   },
@@ -31,7 +31,7 @@ const enhance = StyleSheet.create({
     flexDirection: 'row',
   },
   modalContainer: {
-    backgroundColor: 'white',
+    backgroundColor: COLORS.card,
     padding: 20,
     borderRadius: 12,
     width: '90%',
@@ -57,7 +57,8 @@ const enhance = StyleSheet.create({
     padding: 12,
     marginBottom: 20,
     fontSize: 16,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: COLORS.background,
+    color: COLORS.text,
   },
   buttonContainer: {
     flexDirection: 'row',
@@ -71,7 +72,7 @@ const enhance = StyleSheet.create({
     alignItems: 'center',
   },
   cancelButton: {
-    backgroundColor: '#f8f9fa',
+    backgroundColor: COLORS.background,
     borderWidth: 1,
     borderColor: COLORS.border,
   },

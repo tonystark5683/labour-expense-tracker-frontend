@@ -51,12 +51,40 @@ const oceanTheme = {
   shadow: "#000000",
 };
 
+const darkTheme = {
+  primary: "#64B5F6", // Bright blue for primary actions
+  background: "#121212", // Dark background
+  text: "#E0E0E0", // Light gray text for good readability
+  border: "#2C2C2C", // Slightly lighter than background for subtle borders
+  white: "#FFFFFF", // Pure white for high contrast elements
+  textLight: "#9E9E9E", // Medium gray for secondary text
+  expense: "#FF5252", // Bright red for expenses
+  income: "#69F0AE", // Bright green for income
+  card: "#1E1E1E", // Slightly lighter than background for cards
+  shadow: "#000000", // Black shadows
+};
+const teaTheme = {
+  primary: "#6B8E23", // Olive Green
+  background: "#F0EAD6", // Light Cream
+  text: "#3B3C36", // Dark Olive
+  border: "#C2B280", // Tan
+  white: "#FFFFFF",
+  textLight: "#AFAF9D", // Light Olive
+  expense: "#D32F2F", // Red
+  income: "#388E3C", // Green
+  card: "#FFFFFF",
+  shadow: "#4B4B4B", // Dark Gray
+};
+
+
 export const THEMES = {
   coffee: coffeeTheme,
   forest: forestTheme,
   purple: purpleTheme,
   ocean: oceanTheme,
+  dark: darkTheme,
+  tea: teaTheme,
 };
 
 // 👇 change this to switch theme
-export const COLORS = THEMES.coffee;
+export const COLORS = THEMES.tea;
