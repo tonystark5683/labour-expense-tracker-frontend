@@ -33,7 +33,7 @@ const enhance = StyleSheet.create({
 const CATEGORY_ICONS = {
   "Wages": "cash",
   "Groceries": "cart",
-  "Advance": "wallet",
+  "Cash": "wallet",
   "Medical": "medical",
   // "Tools & Equipment": "construct",
   // "Transport": "bus",
