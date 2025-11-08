@@ -117,7 +117,7 @@ export default function LaborerDetails() {
           <View style={styles.infoRow}>
             <View style={styles.infoItem}>
               <Text style={styles.infoLabel}>Since</Text>
-              <Text style={styles.infoValue}>{formatDate(data?.laborer.joining_date)}</Text>
+              <Text style={styles.infoValue}>{formatDate(data?.laborer.joining_date).split('at')[0]}</Text>
             </View>
             <View style={styles.infoItem}>
               {data?.laborer.phone && (
@@ -245,24 +245,16 @@ export default function LaborerDetails() {
                   onPress={() => {
                     Alert.alert(
                       "Delete Transaction",
-                      "To confirm deletion, please enter the transaction title:",
+                      "Are you sure you want to delete this transaction?",
                       [
                         { text: "Cancel", style: "cancel" },
                         {
                           text: "Delete",
                           style: "destructive",
-                          onPress: async (confirmationTitle) => {
-                            if (!confirmationTitle) {
-                              Alert.alert("Error", "Please enter the transaction title");
-                              return;
-                            }
+                          onPress: async () => {
                             try {
                               const response = await fetch(`${API_URL}/transactions/${transaction._id}`, {
                                 method: "DELETE",
-                                headers: {
-                                  "Content-Type": "application/json",
-                                },
-                                body: JSON.stringify({ confirmationTitle }),
                               });
                               
                               if (!response.ok) {
@@ -277,13 +269,7 @@ export default function LaborerDetails() {
                             }
                           },
                         },
-                      ],
-                      {
-                        input: {
-                          placeholder: "Enter transaction title",
-                          onChange: (text) => text,
-                        },
-                      }
+                      ]
                     );
                   }}
                   style={styles.deleteButton}

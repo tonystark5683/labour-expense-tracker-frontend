@@ -1,10 +1,8 @@
-import { View, Text, TouchableOpacity, StyleSheet, TextInput, Alert } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { styles } from "../assets/styles/home.styles";
 import { COLORS } from "../constants/colors";
 import { formatDate } from "../lib/utils";
-import { useState } from "react";
-import Modal from 'react-native-modal';
 
 const enhance = StyleSheet.create({
   card: {
@@ -29,66 +27,7 @@ const enhance = StyleSheet.create({
   mainContent: {
     flex: 1,
     flexDirection: 'row',
-  },
-  modalContainer: {
-    backgroundColor: COLORS.card,
-    padding: 20,
-    borderRadius: 12,
-    width: '90%',
-    alignSelf: 'center',
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 10,
-    color: COLORS.text,
-    textAlign: 'center',
-  },
-  modalMessage: {
-    fontSize: 16,
-    color: COLORS.textLight,
-    marginBottom: 20,
-    textAlign: 'center',
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: COLORS.border,
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 20,
-    fontSize: 16,
-    backgroundColor: COLORS.background,
-    color: COLORS.text,
-  },
-  buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    gap: 10,
-  },
-  button: {
-    flex: 1,
-    padding: 12,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  cancelButton: {
-    backgroundColor: COLORS.background,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-  },
-  confirmButton: {
-    backgroundColor: COLORS.expense,
-  },
-  cancelButtonText: {
-    color: COLORS.text,
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  confirmButtonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: '600',
-  },
+  }
 });
 
 const CATEGORY_ICONS = {
@@ -102,19 +41,25 @@ const CATEGORY_ICONS = {
 };
 
 export const TransactionItem = ({ item, onDelete }) => {
-  const [isDialogVisible, setIsDialogVisible] = useState(false);
-  const [confirmationTitle, setConfirmationTitle] = useState('');
   const isIncome = parseFloat(item.amount) > 0;
   const iconName = CATEGORY_ICONS[item.category] || "pricetag-outline";
 
   const handleDelete = () => {
-    if (confirmationTitle === item.title) {
-      onDelete(item._id);
-      setIsDialogVisible(false);
-      setConfirmationTitle('');
-    } else {
-      Alert.alert("Error", "Please enter the correct transaction title");
-    }
+    Alert.alert(
+      "Delete Transaction",
+      "Are you sure you want to delete this transaction?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel"
+        },
+        {
+          text: "Delete",
+          onPress: () => onDelete(item._id),
+          style: "destructive"
+        }
+      ]
+    );
   };
 
   return (
@@ -138,56 +83,11 @@ export const TransactionItem = ({ item, onDelete }) => {
               <Text style={styles.transactionDate}>{formatDate(item.created_at)}</Text>
             </View>
           </View>
-          <TouchableOpacity style={styles.deleteButton} onPress={() => setIsDialogVisible(true)}>
+          <TouchableOpacity style={styles.deleteButton} onPress={handleDelete}>
             <Ionicons name="trash-outline" size={20} color={COLORS.expense} />
           </TouchableOpacity>
         </View>
       </View>
-
-      <Modal
-        isVisible={isDialogVisible}
-        onBackdropPress={() => {
-          setIsDialogVisible(false);
-          setConfirmationTitle('');
-        }}
-        onBackButtonPress={() => {
-          setIsDialogVisible(false);
-          setConfirmationTitle('');
-        }}
-        useNativeDriver
-        style={{ margin: 0 }}
-      >
-        <View style={enhance.modalContainer}>
-          <Text style={enhance.modalTitle}>Delete Transaction</Text>
-          <Text style={enhance.modalMessage}>
-            Please type {item.title} to confirm deletion:
-          </Text>
-          <TextInput
-            style={enhance.input}
-            placeholder="Enter transaction title"
-            value={confirmationTitle}
-            onChangeText={setConfirmationTitle}
-            autoCapitalize="none"
-          />
-          <View style={enhance.buttonContainer}>
-            <TouchableOpacity
-              style={[enhance.button, enhance.cancelButton]}
-              onPress={() => {
-                setIsDialogVisible(false);
-                setConfirmationTitle('');
-              }}
-            >
-              <Text style={enhance.cancelButtonText}>Cancel</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[enhance.button, enhance.confirmButton]}
-              onPress={handleDelete}
-            >
-              <Text style={enhance.confirmButtonText}>Delete</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
     </>
   );
 };
